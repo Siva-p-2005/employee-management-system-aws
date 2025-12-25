@@ -1,0 +1,201 @@
+1. AWS EC2 SETUP (UBUNTU)
+EC2 Creation (AWS Console)
+
+Launch EC2
+
+Choose Ubuntu AMI
+
+Instance type: t2.micro
+
+Create / use key pair
+
+Security Group:
+
+Port 22 (SSH)
+
+Port 5000 (Flask)
+
+Launch instance
+
+🔹 2. CONNECT TO EC2 (SSH)
+ssh -i key.pem ubuntu@<EC2_PUBLIC_IP>
+
+🔹 3. SYSTEM UPDATE (LINUX COMMANDS)
+sudo apt update
+sudo apt upgrade -y
+
+🔹 4. INSTALL REQUIRED PACKAGES (VERY IMPORTANT)
+sudo apt install python3 python3-pip python3-venv python3-full mysql-server -y
+
+
+Check versions:
+
+python3 --version
+pip3 --version
+
+🔹 5. CREATE PYTHON VIRTUAL ENVIRONMENT
+python3 -m venv venv
+source venv/bin/activate
+
+
+(You saw: (venv) in terminal)
+
+🔹 6. INSTALL PYTHON LIBRARIES (INSIDE VENV)
+pip install flask mysql-connector-python
+
+
+👉 You faced externally-managed-environment error
+👉 Fixed correctly by using virtual environment ✅
+
+🔹 7. MYSQL LOGIN (ROOT – UBUNTU SOCKET AUTH)
+sudo mysql
+
+🔹 8. MYSQL DATABASE COMMANDS (ALL USED)
+SHOW DATABASES;
+CREATE DATABASE employee_db;
+USE employee_db;
+
+🔹 9. CREATE TABLES (SQL)
+Employees Table
+CREATE TABLE employees (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  emp_code VARCHAR(30),
+  name VARCHAR(100),
+  department VARCHAR(50),
+  email VARCHAR(100),
+  salary INT,
+  status VARCHAR(20)
+);
+
+Users Table
+CREATE TABLE users (
+  username VARCHAR(50) PRIMARY KEY,
+  password VARCHAR(100),
+  role VARCHAR(20)
+);
+
+🔹 10. INSERT USERS (LOGIN DATA)
+INSERT INTO users VALUES
+('admin','admin123','ADMIN'),
+('hr','hr123','HR'),
+('viewer','view123','VIEWER');
+
+🔹 11. SHOW & VERIFY TABLES
+SHOW TABLES;
+SELECT * FROM users;
+
+🔹 12. MYSQL ROOT ACCESS ERROR (IMPORTANT ISSUE)
+
+❌ Error:
+
+Access denied for user 'root'@'localhost'
+
+
+✅ Correct Fix Used (BEST PRACTICE)
+
+🔹 13. CREATE MYSQL APPLICATION USER
+CREATE USER 'empuser'@'localhost' IDENTIFIED BY 'emp@123';
+GRANT ALL PRIVILEGES ON employee_db.* TO 'empuser'@'localhost';
+FLUSH PRIVILEGES;
+
+
+Exit MySQL:
+
+exit;
+
+🔹 14. TEST MYSQL CONNECTION USING PYTHON
+db_test.py
+import mysql.connector
+
+db = mysql.connector.connect(
+    host="localhost",
+    user="empuser",
+    password="emp@123",
+    database="employee_db"
+)
+
+print("MySQL Connected Successfully")
+
+
+Run:
+
+python db_test.py
+
+🔹 15. CREATE FLASK APPLICATION FILE
+nano app.py
+
+
+(You added full Flask code with)
+
+Login
+
+Dashboard
+
+Add employee
+
+Update status
+
+Role-based access
+
+🔹 16. CREATE FRONTEND FILES
+mkdir templates
+nano templates/login.html
+nano templates/dashboard.html
+
+🔹 17. RUN FLASK APPLICATION
+python app.py
+
+
+Flask running on:
+
+http://0.0.0.0:5000
+
+🔹 18. OPEN APPLICATION IN BROWSER
+http://3.6.160.242:5000
+
+
+✔ Login page opened
+✔ Dashboard opened
+
+🔹 19. LOGIN CREDENTIALS USED
+Username	Password	Role
+admin	admin123	ADMIN
+hr	hr123	HR
+viewer	view123	VIEWER
+🔹 20. ADD EMPLOYEE (FROM UI)
+
+Fields used:
+
+Name
+
+Department
+
+Email
+
+Salary
+
+Status
+
+Auto-generated:
+
+EMP-IT-001
+
+🔹 21. UPDATE EMPLOYEE STATUS
+
+From Dashboard:
+
+Active → On Leave
+
+On Leave → Resigned (Discontinue)
+
+🔹 22. SQL VERIFICATION COMMANDS
+SELECT * FROM employees;
+SELECT * FROM employees WHERE status='Active';
+SELECT * FROM employees WHERE status='On Leave';
+SELECT * FROM employees WHERE status='Resigned';
+UPDATE employees SET status='On Leave' WHERE emp_code='EMP-IT-001';
+UPDATE employees SET status='Resigned' WHERE emp_code='EMP-IT-001';
+SELECT COUNT(*) FROM employees;
+
+🔹 23. EXIT MYSQL
+exit;
